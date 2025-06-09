@@ -29,3 +29,22 @@ func SaveCredential(cred model.Credential, path string) error {
 
 	return nil
 }
+
+func LoadCredentials(path string) ([]model.Credential, error) {
+	var creds []model.Credential
+	file, err := os.Open(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return creds, nil 
+		}
+		return nil, err 
+	}
+	defer file.Close()
+	
+	if err := json.NewDecoder(file).Decode((&creds)); err != nil {
+		if errors.Is(err, io.EOF) {
+			return creds, nil 
+		}
+		return nil, err 
+	}
+}
